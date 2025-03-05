@@ -2,6 +2,8 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Stimulsoft } from 'stimulsoft-dashboards-js/Scripts/stimulsoft.viewer';
 
+const STIMULSOFT_KEY = "";
+
 @Component({
   template: ''
 })
@@ -35,25 +37,22 @@ export abstract class StimulsoftViewerComponent implements OnInit, OnDestroy {
     this.options.appearance.allowMobileMode = false;
     this.options.toolbar.showAboutButton = false;
     this.options.toolbar.showOpenButton = false;
-
     this.viewer = new Stimulsoft.Viewer.StiViewer(this.options, this.viewerId, false);
-    // Stimulsoft.Base.StiLicense.key = this.stimulsoftDashboardKey
+    Stimulsoft.Base.StiLicense.key = STIMULSOFT_KEY;
   }
 
   protected async loadReport(): Promise<void> {
     try {
-      const template = await this.http.get(this.reportUrl, { responseType: 'text' }).toPromise();
-      this.report.loadDocument(template);
-      this.viewer.report = this.report;
-      // Asegurar que el contenedor existe en el DOM antes de renderizar
-      setTimeout(() => {
+        const template = await this.http.get(this.reportUrl, { responseType: 'text' }).toPromise();
+        this.report.load(template);          
+        this.viewer.report = this.report;
+        
         const container = document.getElementById(`${this.viewerId}-viewer`);
         if (container) {
-          this.viewer.renderHtml(container);
+            this.viewer.renderHtml(container);
         }
-      }, 300);
     } catch (error) {
-      console.error('Error al cargar el reporte:', error);
+        console.error('Error al cargar el reporte:', error);
     }
-  }
+}
 }

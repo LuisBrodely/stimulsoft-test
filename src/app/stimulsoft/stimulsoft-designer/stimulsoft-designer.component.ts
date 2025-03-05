@@ -2,6 +2,8 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Stimulsoft } from 'stimulsoft-dashboards-js/Scripts/stimulsoft.designer';
 
+const STIMULSOFT_KEY = "";
+
 @Component({
   template: ''
 })
@@ -33,18 +35,16 @@ export abstract class StimulsoftDesignerComponent implements OnInit, OnDestroy {
     this.options.appearance.fullScreenMode = false;
     this.options.toolbar.showAboutButton = false;
     this.designer = new Stimulsoft.Designer.StiDesigner(this.options, this.designerId, false);
-    // Stimulsoft.Base.StiLicense.key = this.stimulsoftDashboardKey
+    Stimulsoft.Base.StiLicense.key = STIMULSOFT_KEY;
   }
 
   protected async loadReport(): Promise<void> {
     try {
       const template = await this.http.get(this.reportUrl, { responseType: 'text' }).toPromise();
-      this.report.loadDocument(template);
+      this.report.load(template);
       this.designer.report = this.report;
-      // Asegurar que el contenedor existe en el DOM antes de renderizar
-      setTimeout(() => {
-        this.designer.renderHtml(`${this.designerId}-designer`);
-      }, 100);
+
+      this.designer.renderHtml(`${this.designerId}-designer`);
     } catch (error) {
       console.error('Error al cargar el reporte:', error);
     }
